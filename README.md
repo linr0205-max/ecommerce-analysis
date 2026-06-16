@@ -1,4 +1,3 @@
-# ecommerce-analysis
 # 电商用户转化归因与策略分析
 
 ## 📌 项目简介
@@ -30,27 +29,6 @@
 - **编程语言**：Python 3.x
 - **可视化库**：Matplotlib, Plotly
 - **版本控制**：Git
-
-## 📁 文件结构
-
-ecommerce-analysis/
-├── sql/ # SQL分析脚本
-│ ├── 01_数据验证.sql
-│ ├── 02_转化漏斗.sql
-│ ├── 03_品类转化率.sql
-│ ├── 04_时段转化率.sql
-│ └── 05_用户分层.sql
-├── charts/ # 可视化图表
-│ ├── 01_漏斗图.png
-│ ├── 02_时段趋势图.png
-│ ├── 03_品类对比图.png
-│ ├── 04_用户分层图.png
-│ └── 05_购买路径构成图.png
-├── report/ # 报告
-│ └── 商业分析报告_PPT风格.pdf
-├── generate_charts.py # Python绘图脚本
-└── README.md
-
 
 ## 🔎 核心发现（摘要）
 
