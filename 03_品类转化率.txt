@@ -1,0 +1,41 @@
+ MySQL  localhost:3306 ssl  shop  SQL > WITH user_category_behavior AS(
+                                     -> SELECT category_id, user_id,
+                                     -> MAX(CASE WHEN behavior_type = 'cart' THEN 1 ELSE 0 END) AS has_cart,
+                                     -> MAX(CASE WHEN behavior_type = 'buy' THEN 1 ELSE 0 END) AS has_buy
+                                     -> FROM user_clean
+                                     -> GROUP BY category_id, user_id),
+                                     -> category_agg AS (
+                                     -> SELECT category_id,
+                                     -> COUNT(DISTINCT user_id) AS total_users_in_cat,
+                                     -> SUM(has_cart) AS cart_users,
+                                     -> SUM(has_buy) AS buy_users,
+                                     -> SUM(CASE WHEN has_cart =1 AND has_buy = 1 THEN 1 ELSE 0 END) AS cart_buy_users
+                                     -> FROM user_category_behavior
+                                     -> GROUP BY category_id
+                                     -> HAVING cart_users >= 50),
+                                     -> pv_counts AS (
+                                     -> SELECT category_id, COUNT(DISTINCT user_id) AS pv_users
+                                     -> FROM user_clean
+                                     -> WHERE behavior_type = 'pv'
+                                     -> GROUP BY category_id)
+                                     -> SELECT c.category_id, p.pv_users, c.cart_users, c.buy_users, c.cart_buy_users,
+                                     -> ROUND(100 * c.cart_buy_users / c.cart_users, 2) AS cart_to_buy_rate,
+                                     -> ROUND(100 * c.buy_users / p.pv_users, 2) AS pv_to_buy_rate
+                                     -> FROM category_agg c
+                                     -> JOIN pv_counts p ON c.category_id = p.category_id
+                                     -> ORDER BY cart_to_buy_rate DESC
+                                     -> LIMIT 10;
++-------------+----------+------------+-----------+----------------+------------------+----------------+
+| category_id | pv_users | cart_users | buy_users | cart_buy_users | cart_to_buy_rate | pv_to_buy_rate |
++-------------+----------+------------+-----------+----------------+------------------+----------------+
+|      174239 |      593 |         53 |        42 |              1 |             1.89 |           7.08 |
+|     1884322 |      408 |         53 |        28 |              1 |             1.89 |           6.86 |
+|      366112 |      563 |         55 |        44 |              1 |             1.82 |           7.82 |
+|      800581 |      648 |         63 |        69 |              1 |             1.59 |          10.65 |
+|     2590256 |      544 |         64 |        24 |              1 |             1.56 |           4.41 |
+|     3524510 |      874 |         69 |        19 |              1 |             1.45 |           2.17 |
+|     4874384 |      721 |         70 |        26 |              1 |             1.43 |           3.61 |
+|     4069500 |     1739 |        148 |        39 |              2 |             1.35 |           2.24 |
+|     4719814 |      920 |         75 |        56 |              1 |             1.33 |           6.09 |
+|     2304296 |      644 |         77 |        26 |              1 |             1.30 |           4.04 |
++-------------+----------+------------+-----------+----------------+------------------+----------------+

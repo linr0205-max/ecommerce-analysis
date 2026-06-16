@@ -1,0 +1,74 @@
+ MySQL  localhost:3306 ssl  shop  SQL > CREATE TABLE user AS SELECT * FROM user_behavior WHERE RAND() < 0.01;
+Query OK, 1000348 rows affected (4 min 39.0335 sec)
+
+Records: 1000348  Duplicates: 0  Warnings: 0
+ MySQL  localhost:3306 ssl  shop  SQL > ALTER TABLE user ADD INDEX idx_user (user_id);
+Query OK, 0 rows affected (3.8859 sec)
+
+Records: 0  Duplicates: 0  Warnings: 0
+ MySQL  localhost:3306 ssl  shop  SQL > ALTER TABLE user ADD INDEX idx_behavior (behavior_type);
+Query OK, 0 rows affected (4.9032 sec)
+
+Records: 0  Duplicates: 0  Warnings: 0
+ MySQL  localhost:3306 ssl  shop  SQL > ALTER TABLE user ADD INDEX idx_category (category_id);
+Query OK, 0 rows affected (3.4792 sec)
+
+Records: 0  Duplicates: 0  Warnings: 0
+ MySQL  localhost:3306 ssl  shop  SQL > ALTER TABLE user ADD INDEX idx_time (timestamp);
+Query OK, 0 rows affected (3.2615 sec)
+
+Records: 0  Duplicates: 0  Warnings: 0
+ MySQL  localhost:3306 ssl  shop  SQL > SELECT COUNT(*) AS total_rows, COUNT(DISTINCT user_id) AS unique_users
+                                     -> FROM user;
++------------+--------------+
+| total_rows | unique_users |
++------------+--------------+
+|    1000348 |       529023 |
++------------+--------------+
+1 row in set (1.0587 sec)
+ MySQL  localhost:3306 ssl  shop  SQL > SELECT FROM_UNIXTIME(MIN(timestamp)) AS start_date,
+                                     -> FROM_UNIXTIME(MAX(timestamp)) AS end_date
+                                     -> FROM user;
++------------+---------------------+
+| start_date | end_date            |
++------------+---------------------+
+| NULL       | 2036-10-22 07:59:30 |
++------------+---------------------+
+1 row in set (0.0048 sec)
+ MySQL  localhost:3306 ssl  shop  SQL > CREATE TABLE user_clean AS SELECT * FROM user WHERE timestamp BETWEEN 1509993600 AND 1512316799;
+Query OK, 1000288 rows affected (12.5219 sec)
+
+Records: 1000288  Duplicates: 0  Warnings: 0
+ MySQL  localhost:3306 ssl  shop  SQL > SELECT UNIXTIME(MIN(timestamp)) AS start_date, UNIXTIME(MAX(timestamp)) AS end_date FROM user_clean;
+ERROR: 1305 (42000): FUNCTION shop.UNIXTIME does not exist
+ MySQL  localhost:3306 ssl  shop  SQL > SELECT FROM_UNIXTIME(MIN(timestamp)) AS start_date, FROM_UNIXTIME(MAX(timestamp)) AS end_date FROM user_clean;
++---------------------+---------------------+
+| start_date          | end_date            |
++---------------------+---------------------+
+| 2017-11-11 01:06:38 | 2017-12-03 23:59:58 |
++---------------------+---------------------+
+1 row in set (0.7426 sec)
+ MySQL  localhost:3306 ssl  shop  SQL > ALTER TABLE user_clean ADD INDEX idx_user (user_id);
+Query OK, 0 rows affected (2.8989 sec)
+
+Records: 0  Duplicates: 0  Warnings: 0
+ MySQL  localhost:3306 ssl  shop  SQL > ALTER TABLE user_clean ADD INDEX idx_behavior (behavior_type);
+Query OK, 0 rows affected (3.4270 sec)
+
+Records: 0  Duplicates: 0  Warnings: 0
+ MySQL  localhost:3306 ssl  shop  SQL > ALTER TABLE user_clean ADD INDEX idx_time (timestamp);
+Query OK, 0 rows affected (2.9553 sec)
+
+Records: 0  Duplicates: 0  Warnings: 0
+ MySQL  localhost:3306 ssl  shop  SQL > SELECT behavior_type,COUNT(*) AS cnt
+                                     -> FROM user_clean
+                                     -> GROUP BY behavior_type;
++---------------+--------+
+| behavior_type | cnt    |
++---------------+--------+
+| buy           |  19991 |
+| cart          |  55360 |
+| fav           |  28715 |
+| pv            | 896222 |
++---------------+--------+
+4 rows in set (0.8561 sec)

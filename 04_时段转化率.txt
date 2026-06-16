@@ -1,0 +1,39 @@
+ MySQL  localhost:3306 ssl  shop  SQL > SELECT
+                                     -> HOUR(FROM_UNIXTIME(timestamp)) AS hour_of_day,
+                                     ->
+                                     -> COUNT(DISTINCT CASE WHEN behavior_type = 'pv' THEN user_id END) AS pv_users,
+                                     -> COUNT(DISTINCT CASE WHEN behavior_type = 'cart' THEN user_id END) AS cart_users,
+
+                                     -> COUNT(DISTINCT CASE WHEN behavior_type = 'buy' THEN user_id END) AS buy_users,
+                                     -> ROUND(100 * COUNT(DISTINCT CASE WHEN behavior_type = 'buy' THEN user_id END) / NULLIF(COUNT(DISTINCT CASE WHEN behavior_type = 'pv' THEN user_id END),0),2) AS conversion_rate
+                                     -> FROM user_clean
+                                     -> GROUP BY hour_of_day
+                                     -> ORDER BY conversion_rate DESC;
++-------------+----------+------------+-----------+-----------------+
+| hour_of_day | pv_users | cart_users | buy_users | conversion_rate |
++-------------+----------+------------+-----------+-----------------+
+|          10 |    39900 |       2644 |      1282 |            3.21 |
+|          11 |    38871 |       2568 |      1162 |            2.99 |
+|          12 |    39265 |       2495 |      1140 |            2.90 |
+|          14 |    42332 |       2736 |      1188 |            2.81 |
+|          15 |    44130 |       2849 |      1229 |            2.78 |
+|          13 |    42505 |       2776 |      1157 |            2.72 |
+|          17 |    38791 |       2585 |      1047 |            2.70 |
+|          16 |    42050 |       2822 |      1098 |            2.61 |
+|           9 |    34375 |       2299 |       884 |            2.57 |
+|          18 |    39436 |       2492 |       979 |            2.48 |
+|          19 |    49170 |       3132 |      1160 |            2.36 |
+|          20 |    59094 |       3812 |      1357 |            2.30 |
+|           8 |    28137 |       1901 |       643 |            2.29 |
+|          21 |    66514 |       4618 |      1501 |            2.26 |
+|          22 |    65840 |       4732 |      1353 |            2.05 |
+|          23 |    49531 |       3904 |      1001 |            2.02 |
+|           0 |    27212 |       1716 |       548 |            2.01 |
+|           3 |     4833 |        327 |        88 |            1.82 |
+|           7 |    20715 |       1462 |       377 |            1.82 |
+|           1 |    12914 |        901 |       234 |            1.81 |
+|           5 |     5407 |        404 |        96 |            1.78 |
+|           6 |    11427 |        816 |       191 |            1.67 |
+|           4 |     4127 |        288 |        66 |            1.60 |
+|           2 |     7042 |        466 |       105 |            1.49 |
++-------------+----------+------------+-----------+-----------------+
